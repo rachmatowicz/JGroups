@@ -1,39 +1,103 @@
 package org.jgroups.util;
 
-import org.jgroups.*;
-import org.jgroups.TimeoutException;
-import org.jgroups.auth.AuthToken;
-import org.jgroups.blocks.Connection;
-import org.jgroups.conf.ClassConfigurator;
-import org.jgroups.jmx.JmxConfigurator;
-import org.jgroups.logging.Log;
-import org.jgroups.logging.LogFactory;
-import org.jgroups.protocols.*;
-import org.jgroups.protocols.pbcast.FLUSH;
-import org.jgroups.protocols.pbcast.GMS;
-import org.jgroups.stack.IpAddress;
-import org.jgroups.stack.Protocol;
-import org.jgroups.stack.ProtocolStack;
-
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.*;
+import java.lang.reflect.Modifier;
+import java.net.BindException;
+import java.net.DatagramSocket;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.MulticastSocket;
+import java.net.NetworkInterface;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
+
+import org.jgroups.Address;
+import org.jgroups.Channel;
+import org.jgroups.Event;
+import org.jgroups.Global;
+import org.jgroups.Header;
+import org.jgroups.JChannel;
+import org.jgroups.MergeView;
+import org.jgroups.Message;
+import org.jgroups.TimeoutException;
+import org.jgroups.View;
+import org.jgroups.ViewId;
+import org.jgroups.auth.AuthToken;
+import org.jgroups.blocks.Connection;
+import org.jgroups.conf.ClassConfigurator;
+import org.jgroups.jmx.JmxConfigurator;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
+import org.jgroups.protocols.DISCARD;
+import org.jgroups.protocols.FD;
+import org.jgroups.protocols.FD_SOCK;
+import org.jgroups.protocols.PingData;
+import org.jgroups.protocols.PingHeader;
+import org.jgroups.protocols.SCOPE;
+import org.jgroups.protocols.TP;
+import org.jgroups.protocols.pbcast.FLUSH;
+import org.jgroups.protocols.pbcast.GMS;
+import org.jgroups.stack.IpAddress;
+import org.jgroups.stack.Protocol;
+import org.jgroups.stack.ProtocolStack;
 
 
 /**
@@ -862,6 +926,20 @@ public class Util {
         int retval=Global.BYTE_SIZE; // presence
         if(vid != null)
             retval+=vid.serializedSize();
+        return retval;
+    }
+
+    public static int size(String s) {
+        int retval = Global.BYTE_SIZE;
+        if (s != null)
+            retval += s.length() + 2;
+        return retval;
+    }
+
+    public static int size(byte[] buf) {
+        int retval = Global.BYTE_SIZE + Global.INT_SIZE;
+        if (buf != null)
+            retval += buf.length;
         return retval;
     }
 
@@ -2300,6 +2378,18 @@ public class Util {
         return 0;
     }
 
+    public static int getRank(Collection<Address> members, Address addr) {
+        if (members == null || addr == null)
+            return -1;
+        int index = 0;
+        for (Iterator<Address> it = members.iterator(); it.hasNext(); ) {
+            Address mbr = it.next();
+            if (mbr.equals(addr))
+                return index + 1;
+            index++;
+        }
+        return -1;
+    }
 
     public static Object pickRandomElement(List list) {
         if(list == null) return null;
@@ -2643,6 +2733,18 @@ public class Util {
             }
         }
         return field;
+    }
+
+    public static void setField(Field field, Object target, Object value) {
+        if(!Modifier.isPublic(field.getModifiers())) {
+            field.setAccessible(true);
+        }
+        try {
+            field.set(target, value);
+        }
+        catch(IllegalAccessException iae) {
+            throw new IllegalArgumentException("Could not set field " + field, iae);
+        }
     }
 
 

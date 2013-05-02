@@ -1,13 +1,17 @@
 package org.jgroups.util;
 
-import org.jgroups.Address;
-import org.jgroups.annotations.GuardedBy;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.TimeUnit;
+
+import org.jgroups.Address;
+import org.jgroups.annotations.GuardedBy;
 
 /** Similar to AckCollector, but collects responses, not just acks. Null is not a valid key.
  * @author Bela Ban
@@ -73,6 +77,19 @@ public class ResponseCollector<T> {
             for(Address member: members)
                 responses.remove(member);
             cond.signalAll();
+        }
+        finally {
+            lock.unlock();
+        }
+    }
+
+    public void retainAll(List<Address> members) {
+        if(members == null || members.isEmpty())
+            return;
+        lock.lock();
+        try {
+            if(responses.keySet().retainAll(members))
+                cond.signalAll();
         }
         finally {
             lock.unlock();
