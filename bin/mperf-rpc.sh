@@ -3,6 +3,4 @@
 
 #!/bin/bash
 
-JG=$HOME/JGroups
-
 jgroups.sh org.jgroups.tests.perf.MPerfRpc $*
