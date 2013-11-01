@@ -21,6 +21,7 @@ public class McastSenderTest {
         MulticastSocket[] sockets=null;
         MulticastSocket sock;
         InetAddress mcast_addr=null, bind_addr=null;
+        boolean disable_loopback=false;
         DatagramPacket packet;
         byte[]            buf=new byte[0];
         String tmp;
@@ -54,6 +55,10 @@ public class McastSenderTest {
                     port=Integer.parseInt(args[++i]);
                     continue;
                 }
+                if("-disable_loopback".equals(tmp)) {
+                    disable_loopback=Boolean.parseBoolean(args[++i]);
+                    continue;
+                }
                 help();
                 return;
             }
@@ -80,6 +85,7 @@ public class McastSenderTest {
             for(int i=0; i < v.size(); i++) {
                 sock=new MulticastSocket(port);
                 sock.setTimeToLive(ttl);
+                sock.setLoopbackMode(disable_loopback);
                 sock.setInterface(v.get(i));
                 sockets[i]=sock;
                 ack_receiver=new AckReceiver(sock);
@@ -91,7 +97,7 @@ public class McastSenderTest {
                 sock=sockets[i];
                 if(sock == null) continue;
                 System.out.println("Socket #" + (i + 1) + '=' + sock.getLocalAddress() + ':' + sock.getLocalPort() +
-                        ", ttl=" + sock.getTimeToLive() + ", bind interface=" + sock.getInterface());
+                        ", ttl=" + sock.getTimeToLive() + ",bind interface=" + sock.getInterface() + ",local loopback = " + sock.getLoopbackMode());
             }
 
             in=new DataInputStream(System.in);
@@ -150,7 +156,7 @@ public class McastSenderTest {
                     buf=new byte[256];
                     packet=new DatagramPacket(buf, buf.length);
                     sock.receive(packet);
-                    System.out.println("<< Received packet from " +
+                    System.out.println("<< [ receiver=" + ((MulticastSocket)sock).getInterface() + "] Received packet from " +
                             packet.getAddress().getHostAddress() + ':' +
                             packet.getPort() + ": " + new String(packet.getData()));
                 }

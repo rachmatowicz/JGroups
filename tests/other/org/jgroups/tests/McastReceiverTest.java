@@ -45,7 +45,6 @@ public class McastReceiverTest {
                     port=Integer.parseInt(args[++i]);
                     continue;
                 }
-
                 help();
                 return;
             }
@@ -77,7 +76,7 @@ public class McastReceiverTest {
 
     static void help() {
         System.out.println("McastReceiverTest [-bind_addr <bind address>] [-help] [-mcast_addr <multicast address>] " +
-                "[-port <port for multicast socket>]");
+                "[-port <port for multicast socket>] [-disable_loopback <true|false>]" );
     }
 
 
@@ -94,7 +93,7 @@ public class McastReceiverTest {
                 sock.setInterface(bind_interface);
             sock.joinGroup(mcast_addr);
             System.out.println("Socket=" + sock.getLocalAddress() + ':' + sock.getLocalPort() + ", bind interface=" +
-                    sock.getInterface());
+                    sock.getInterface() + ",local loopback = " + sock.getLoopbackMode());
         }
 
 
@@ -106,7 +105,7 @@ public class McastReceiverTest {
                     sock.receive(packet);
                     recv_buf=packet.getData();
                     recv_len=packet.getLength();
-                    System.out.println(new String(recv_buf,0,recv_len) + " [sender=" + packet.getAddress().getHostAddress() +
+                    System.out.println(new String(recv_buf,0,recv_len) + " [receiver=" + sock.getInterface() + ", sender=" + packet.getAddress().getHostAddress() +
                             ':' + packet.getPort() + ']');
                 }
                 catch(Exception ex) {
