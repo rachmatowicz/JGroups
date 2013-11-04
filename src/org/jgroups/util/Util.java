@@ -231,6 +231,8 @@ public class Util {
     public static void waitUntilAllChannelsHaveSameSize(long timeout, long interval, Channel... channels) throws TimeoutException {
         int size=channels.length;
 
+        timeout = timeout*getSlowHostFactor();
+
         if(interval >= timeout || timeout <= 0)
             throw new IllegalArgumentException("interval needs to be smaller than timeout or timeout needs to be > 0");
         long target_time=System.currentTimeMillis() + timeout;
@@ -268,6 +270,9 @@ public class Util {
      * @param <T> The type of the list
      */
     public static <T> void waitUntilListHasSize(List<T> list, int expected_size, long timeout, long interval) {
+
+        timeout=timeout*getSlowHostFactor();
+
         if(list == null)
             throw new IllegalStateException("list is null");
         long target_time=System.currentTimeMillis() + timeout;
@@ -1402,8 +1407,9 @@ public class Util {
 
     /** Sleep for timeout msecs. Returns when timeout has elapsed or thread was interrupted */
     public static void sleep(long timeout) {
+
         try {
-            Thread.sleep(timeout);
+            Thread.sleep(timeout*getSlowHostFactor());
         }
         catch(InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -1413,7 +1419,7 @@ public class Util {
 
     public static void sleep(long timeout, int nanos) {
         try {
-            Thread.sleep(timeout,nanos);
+            Thread.sleep(timeout*getSlowHostFactor(),nanos);
         }
         catch(InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -4457,7 +4463,12 @@ public class Util {
     }
 
 
-
+    /*
+     * A multiplication factor for lengthening timeouts on slow hosts
+     */
+    private static long getSlowHostFactor() {
+        return Long.parseLong(System.getProperty("SLOW_HOST_FACTOR", "1"));
+    }
 
 }
 
