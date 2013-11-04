@@ -4467,7 +4467,7 @@ public class Util {
      * A multiplication factor for lengthening timeouts on slow hosts
      */
     private static long getSlowHostFactor() {
-        return Long.parseLong(System.getProperty("SLOW_HOST_FACTOR", "1"));
+        return Long.parseLong(System.getProperty("jgroups.slow_host_factor", "1"));
     }
 
 }
