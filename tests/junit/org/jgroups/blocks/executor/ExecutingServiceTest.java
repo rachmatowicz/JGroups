@@ -48,7 +48,7 @@ import org.testng.annotations.Test;
 /** Tests {@link org.jgroups.blocks.executor.ExecutionService}
  * @author wburns
  */
-@Test(groups=Global.STACK_DEPENDENT,sequential=true, enabled=false)
+@Test(groups=Global.STACK_DEPENDENT,sequential=true)
 public class ExecutingServiceTest extends ChannelTestBase {
     protected static Log logger=null;
     protected ExposedExecutingProtocol exposedProtocol;
