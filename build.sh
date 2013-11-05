@@ -51,8 +51,8 @@ else
 fi
 
 if [ -n "$JAVA_HOME" ]; then
-	${JAVA_HOME}/bin/java -classpath "${CP}" org.apache.tools.ant.Main -buildfile ${JG_HOME}/build.xml $*
+	${JAVA_HOME}/bin/java -Xms64m -Xmx64m -classpath "${CP}" org.apache.tools.ant.Main -buildfile ${JG_HOME}/build.xml $*
 else
-	java -classpath "${CP}" org.apache.tools.ant.Main -buildfile ${JG_HOME}/build.xml $*
+	java -Xms64m -Xmx64m -classpath "${CP}" org.apache.tools.ant.Main -buildfile ${JG_HOME}/build.xml $*
 fi
 #echo "CP is ${CP}"
