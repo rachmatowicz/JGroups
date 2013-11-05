@@ -46,6 +46,10 @@
     <property name="threadcount" value="false"/>
     <property name="test.verbose" value="0"/>
 
+    <!-- Parallelization controls (disable with "-Dparallel.tests=false -Dparallel.methods=false") -->
+    <property name="parallel.tests" value="tests"/>
+    <property name="parallel.methods" value="methods"/>
+
     <path id="jg.classpath">
         <pathelement location="${compile.dir}"/>
         <pathelement location="${conf.dir}"/>
@@ -385,54 +389,34 @@
 
     <target name="functional" depends="postcompile">
         <mkdir dir="${tmp.dir}/test-results/xml/functional"/>
-        <testng classpathref="jg.classpath"
-                usedefaultlisteners="false"
-                outputdir="${tmp.dir}/test-results/xml"
-                listeners="org.jgroups.util.JUnitXMLReporter"
-                threadcount="10"
-                parallel="methods"
-                >
-        	<jvmarg value="-Djava.net.preferIPv4Stack=${java.net.preferIPv4Stack}"/>
-        	<jvmarg value="-Djava.net.preferIPv6Addresses=${java.net.preferIPv6Addresses}"/>
-            <xmlfileset dir="${testng.conf.dir}" includes="functional.xml"/>
-        </testng>
+        <runtest testname.ext="functional"
+                 threadcount="10"
+                 parallel="${parallel.methods}"
+                 testng.xmlfile="functional.xml"/>
     </target>
 
     <target name="byteman" depends="postcompile">
         <mkdir dir="${tmp.dir}/test-results/xml/byteman"/>
-        <testng classpathref="jg.classpath.byteman"
-                usedefaultlisteners="false"
-                outputdir="${tmp.dir}/test-results/xml"
-                listeners="org.jgroups.util.JUnitXMLReporter"
-                threadcount="1"
-                parallel="false" 
-                >
-        	<jvmarg value="-Djava.net.preferIPv4Stack=${java.net.preferIPv4Stack}"/>
-        	<jvmarg value="-Djava.net.preferIPv6Addresses=${java.net.preferIPv6Addresses}"/>
-            <xmlfileset dir="${testng.conf.dir}" includes="byteman.xml"/>
-        </testng>
+        <runtest classpath="jg.classpath.byteman"
+                 testname.ext="byteman"
+                 threadcount="1"
+                 parallel="false"
+                 testng.xmlfile="byteman.xml"/>
     </target>
 
     <target name="time-sensitive" depends="postcompile">
         <mkdir dir="${tmp.dir}/test-results/xml/time-sensitive"/>
-        <testng classpathref="jg.classpath"
-                usedefaultlisteners="false"
-                outputdir="${tmp.dir}/test-results/xml"
-                listeners="org.jgroups.util.JUnitXMLReporter"
-                threadcount="1"
-                parallel="methods"
-                >
-        	<jvmarg value="-Djava.net.preferIPv4Stack=${java.net.preferIPv4Stack}"/>
-        	<jvmarg value="-Djava.net.preferIPv6Addresses=${java.net.preferIPv6Addresses}"/>
-            <xmlfileset dir="${testng.conf.dir}" includes="time-sensitive.xml"/>
-        </testng>
+        <runtest testname.ext="sensitive"
+                 threadcount="1"
+                 parallel="${parallel.methods}"
+                 testng.xmlfile="time-sensitive.xml"/>
     </target>
 
     <target name="stack-independent" depends="postcompile">
         <mkdir dir="${tmp.dir}/test-results/xml/stack-independent"/>
         <runtest testname.ext="ind"
                  threadcount="1"
-                 parallel="tests"
+                 parallel="${parallel.tests}"
                  testng.xmlfile="stack-independent.xml"
                 />
     </target>
@@ -442,7 +426,7 @@
         <mkdir dir="${tmp.dir}/test-results/xml/udp"/>
         <runtest testname.ext="udp"
                  threadcount="5"
-                 parallel="tests"
+                 parallel="${parallel.tests}"
                  initial.mcast.addr="${jgroups.udp.mcast_addr}"
                  initial.mcast.port="25000"
                  initial.tcp.port="25000"
@@ -454,7 +438,7 @@
         <mkdir dir="${tmp.dir}/test-results/xml/udp-flush"/>
         <runtest testname.ext="udp-flush"
                  threadcount="5"
-                 parallel="tests"
+                 parallel="${parallel.tests}"
                  initial.mcast.addr="${jgroups.udp.mcast_addr}"
                  initial.mcast.port="26000"
                  initial.tcp.port="26000"
@@ -470,7 +454,7 @@
     	<mkdir dir="${tmp.dir}/test-results/xml/tcp"/>
         <runtest testname.ext="tcp"
                  threadcount="5"
-                 parallel="tests"
+                 parallel="${parallel.tests}"
                  initial.mcast.addr="${jgroups.udp.mcast_addr}"
                  initial.mcast.port="27000"
                  initial.tcp.port="27000"
@@ -488,7 +472,7 @@
     	<mkdir dir="${tmp.dir}/test-results/xml/tcp"/>
         <runtest testname.ext="tcp"
                  threadcount="1"
-                 parallel="tests"
+                 parallel="${parallel.tests}"
                  initial.mcast.addr="${jgroups.udp.mcast_addr}"
                  initial.mcast.port="28000"
                  initial.tcp.port="28000"
@@ -505,7 +489,7 @@
     	<mkdir dir="${tmp.dir}/test-results/xml/tcp-flush"/>
         <runtest testname.ext="tcp-flush"
                  threadcount="10"
-                 parallel="tests"
+                 parallel="${parallel.tests}"
                  initial.mcast.addr="${jgroups.udp.mcast_addr}"
                  initial.mcast.port="29000"
                  initial.tcp.port="29000"
@@ -534,6 +518,7 @@
 
 
     <macrodef name="runtest" description="Runs a configuration-dependent test suite">
+        <attribute name="classpath" default="jg.classpath"/>
         <attribute name="outputdir" default="${tmp.dir}/test-results/xml"/>
         <attribute name="parallel" default="methods"/>
         <attribute name="testname.ext" default="udp"/>
@@ -545,16 +530,22 @@
         <attribute name="tcp.recv.buf.size" default="200000"/>
         <attribute name="tcp.send.buf.size" default="64000"/>
         <sequential>
-            <testng classpathref="jg.classpath"
+
+            <!-- use XSLT to add parallelism directives to the suite definition files -->
+            <xslt in="${testng.conf.dir}/@{testng.xmlfile}" out="${tmp.dir}/@{testng.xmlfile}"
+                  extension=".xml" style="${testng.conf.dir}/parallelConfig.xsl">
+              <param name="parallel" expression="@{parallel}"/>
+              <param name="thread-count" expression="@{threadcount}"/>
+            </xslt>
+
+            <testng classpathref="@{classpath}"
                     usedefaultlisteners="false"
                     outputdir="@{outputdir}"
                     listeners="org.jgroups.util.JUnitXMLReporter"
             		timeout="${unittest.timeout}"
             	    verbose="${test.verbose}"
-                    parallel="@{parallel}"
-                    threadcount="@{threadcount}"
                     >
-                <xmlfileset dir="${testng.conf.dir}" includes="@{testng.xmlfile}"/>
+                <xmlfileset dir="${tmp.dir}" includes="@{testng.xmlfile}"/>
                 <sysproperty key="test.suffix" value="@{testname.ext}"/>
                 <sysproperty key="INITIAL_MCAST_ADDR" value="@{initial.mcast.addr}"/>
                 <sysproperty key="INITIAL_MCAST_PORT" value="@{initial.mcast.port}"/>
