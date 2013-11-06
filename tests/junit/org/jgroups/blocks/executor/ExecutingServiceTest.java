@@ -59,6 +59,7 @@ public class ExecutingServiceTest extends ChannelTestBase {
     
     @BeforeClass
     protected void init() throws Exception {
+        System.out.println(" ---- init (S) -----");
         logger = LogFactory.getLog(ExecutingServiceTest.class);
         c1=createChannel(true, 3, "A");
         
@@ -80,15 +81,19 @@ public class ExecutingServiceTest extends ChannelTestBase {
         c3.connect("ExecutionServiceTest");
         
         LogFactory.getLog(ExecutionRunner.class).setLevel("debug");
+        System.out.println(" ---- init (E) -----");
     }
     
     @AfterClass
     protected void cleanup() {
+        System.out.println(" ---- cleanup (S) -----");
         Util.close(c3,c2,c1);
+        System.out.println(" ---- cleanup (E) -----");
     }
     
     @BeforeMethod
     protected void createExecutors() {
+        System.out.println(" ---- createExecutors (S) -----");
         e1=new ExecutionService(c1);
         e2=new ExecutionService(c2);
         e3=new ExecutionService(c3);
@@ -97,18 +102,25 @@ public class ExecutingServiceTest extends ChannelTestBase {
         SleepingStreamableCallable.canceledThreads.clear();
         // Reset the barrier in case test failed on the barrier
         SleepingStreamableCallable.barrier.reset();
+        System.out.println(" ---- createExecutors (E) -----");
     }
     
     @AfterMethod
     protected void resetBlockers() {
+        System.out.println(" ---- resetBlockers (S) -----");
+
         CyclicBarrier barrier = ExposedExecutingProtocol.requestBlocker.getAndSet(null);
         if (barrier != null) barrier.reset();
+        System.out.println(" ---- resetBlockers (E) -----");
     }
     
     @AfterMethod
     protected void makeSureClean() {
+        System.out.println(" ---- makeSureClean (S) -----");
+
         assert e1._unfinishedFutures.isEmpty() : "Unfinished e1 futures should be empty!";
         assert e2._unfinishedFutures.isEmpty() : "Unfinished e2 futures should be empty!";
+        System.out.println(" ---- makeSureClean (E) -----");
     }
     
     public static class ExposedExecutingProtocol extends CENTRAL_EXECUTOR {
