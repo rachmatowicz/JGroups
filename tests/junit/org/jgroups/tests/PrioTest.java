@@ -1,5 +1,9 @@
 package org.jgroups.tests;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.CyclicBarrier;
+
 import org.jgroups.Global;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
@@ -13,10 +17,6 @@ import org.jgroups.util.Util;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.CyclicBarrier;
 
 /**
  * @author Bela Ban
@@ -37,6 +37,8 @@ public class PrioTest extends ChannelTestBase {
         c2.connect("PrioTest");
         r2=new PrioReceiver();
         c2.setReceiver(r2);
+        // this needs to be fixed
+        // Util.waitUntilAllChannelsHaveSameSize(10000,1000, c1, c2);
         assert c2.getView().size() == 2;
     }
 

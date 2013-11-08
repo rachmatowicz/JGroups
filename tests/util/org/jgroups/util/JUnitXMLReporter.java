@@ -38,6 +38,7 @@ public class JUnitXMLReporter implements ITestListener, IConfigurationListener2 
 
     /** Invoked at the start of the test, before any of the classes in the test are run */
     public void onStart(ITestContext context) {
+        System.out.println("-- onStart -- " + context.getName());
         output_dir=context.getOutputDirectory();
         // Uncomment to delete dir created by previous run of this testsuite
         //        File dir=new File(output_dir);
@@ -54,6 +55,7 @@ public class JUnitXMLReporter implements ITestListener, IConfigurationListener2 
 
     /** Invoked after all test classes in this test have been run */
     public void onFinish(ITestContext context) {
+        System.out.println("-- onFinish -- " + context.getName());
         try {
             for(DataOutputStream out: tests.values())
                 Util.close(out);
@@ -72,52 +74,70 @@ public class JUnitXMLReporter implements ITestListener, IConfigurationListener2 
 
     /* Invoked at the start of each test method in a test class */
     public void onTestStart(ITestResult result) {
+        System.out.println("-- onTestStart -- " + result.getName());
         setupStreams(result, true);
     }
 
 
     /** Invoked each time a test method succeeds */
     public void onTestSuccess(ITestResult tr) {
+        System.out.println("-- onTestSuccess --" + tr.getName() );
         onTestCompleted(tr, "OK:   ", old_stdout);
     }
 
 
     public void onTestFailedButWithinSuccessPercentage(ITestResult tr) {
+        System.out.println("-- onTestFailedBut... --"  + tr.getName() );
         onTestCompleted(tr, "OK:   ",old_stdout);
     }
 
     /** Invoked each time a test method fails */
     public void onTestFailure(ITestResult tr) {
+        System.out.println("-- onTestFailure --" + tr.getName()  );
         onTestCompleted(tr, "FAIL: ",old_stderr);
     }
 
     /** Invoked each time a test method is skipped */
     public void onTestSkipped(ITestResult tr) {
+        System.out.println("-- onTestSkipped --" + tr.getName());
         onTestCompleted(tr, "SKIP: ",old_stderr);
     }
 
     public void beforeConfiguration(ITestResult tr) {
+        System.out.println("-- beforeConfiguration --" + tr.getName());
         setupStreams(tr, false);
     }
 
     public void onConfigurationSuccess(ITestResult tr) {
+        System.out.println("-- onConfigurationSuccess --" + tr.getName());
 
     }
 
     public void onConfigurationFailure(ITestResult tr) {
+        System.out.println("-- onConfigurationFailure --" + tr.getName());
         error("failed config: " + tr.getThrowable());
         onTestCompleted(tr, "FAIL: ", old_stderr);
     }
 
     public void onConfigurationSkip(ITestResult tr) {
+        System.out.println("-- onConfigurationSkip --" + tr.getName());
     }
 
 
     protected void onTestCompleted(ITestResult tr, String message, PrintStream out) {
+        System.out.println("-- onTestCompleted --" + tr.getName());
         Class<?> real_class=tr.getTestClass().getRealClass();
         addTest(real_class,tr);
         print(out,message,real_class.getName(),getMethodName(tr));
         closeStreams();
+    }
+
+    public void beforeInvocation(IInvokedMethod method, ITestResult tr) {
+        System.out.println("-- beforeInvocation --" + tr.getName());
+    }
+
+    public void afterInvocation(IInvokedMethod method, ITestResult tr) {
+        System.out.println("-- afterInvocation --" + tr.getName());
     }
 
     protected void setupStreams(ITestResult result, boolean printMethodName) {
