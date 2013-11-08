@@ -1,5 +1,11 @@
 package org.jgroups.blocks;
 
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+
 import org.jgroups.Global;
 import org.jgroups.JChannel;
 import org.jgroups.blocks.locking.LockService;
@@ -12,12 +18,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
 
 /** Tests {@link org.jgroups.blocks.locking.LockService}
  * @author Bela Ban
@@ -104,7 +104,7 @@ public class LockServiceTest extends ChannelTestBase {
         }
     }
 
-
+    @Test(groups = "broken")
     public void testLockInterrupt() {
         // Interrupt ourselves before trying to acquire lock
         Thread.currentThread().interrupt();
