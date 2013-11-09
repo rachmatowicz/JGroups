@@ -38,7 +38,7 @@ public class PrioTest extends ChannelTestBase {
         r2=new PrioReceiver();
         c2.setReceiver(r2);
         // this needs to be fixed
-        // Util.waitUntilAllChannelsHaveSameSize(10000,1000, c1, c2);
+        Util.waitUntilAllChannelsHaveSameSize(10000,1000, c1, c2);
         assert c2.getView().size() == 2;
     }
 
