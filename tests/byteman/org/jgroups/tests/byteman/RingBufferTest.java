@@ -1,12 +1,12 @@
 package org.jgroups.tests.byteman;
 
+import java.util.List;
+
 import org.jboss.byteman.contrib.bmunit.BMNGRunner;
 import org.jboss.byteman.contrib.bmunit.BMScript;
 import org.jgroups.Global;
 import org.jgroups.util.RingBufferLockless;
 import org.testng.annotations.Test;
-
-import java.util.List;
 
 /**
  * Tests the correctness of RingBuffer
@@ -59,7 +59,8 @@ public class RingBufferTest extends BMNGRunner {
      * T1 does a CAS(null, 5) and succeeds because T2 just nulled the element
      ==> We now deliver the message at index 5 TWICE (or multiple times) !
      */
-    @BMScript(dir="scripts/RingBufferTest", value="testRemoveAndConcurrentAdd")
+    // @BMScript(dir="scripts/RingBufferTest", value="testRemoveAndConcurrentAdd")
+    @BMScript(dir="RingBufferTest", value="testRemoveAndConcurrentAdd")
     public void testRemoveAndConcurrentAdd() throws InterruptedException {
         final RingBufferLockless<Integer> buf=new RingBufferLockless<Integer>(10, 0);
         for(int i=1; i <= 5; i++)

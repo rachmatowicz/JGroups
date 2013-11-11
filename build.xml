@@ -53,6 +53,8 @@
     <path id="jg.classpath">
         <pathelement location="${compile.dir}"/>
         <pathelement location="${conf.dir}"/>
+        <!-- need Byteman scripts on classpath -->
+        <pathelement location="${conf.dir}/scripts"/>
         <pathelement location="${keystore.dir}"/>
         <fileset dir="${lib.dir}">
             <include name="*.jar"/>

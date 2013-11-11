@@ -3,6 +3,7 @@ package org.jgroups.util;
 import org.testng.*;
 
 import java.io.*;
+import java.io.PrintStream;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -129,7 +130,7 @@ public class JUnitXMLReporter implements ITestListener, IConfigurationListener2 
         Class<?> real_class=tr.getTestClass().getRealClass();
         addTest(real_class,tr);
         print(out,message,real_class.getName(),getMethodName(tr));
-        closeStreams();
+        closeStreams(tr.getName());
     }
 
     public void beforeInvocation(IInvokedMethod method, ITestResult tr) {
@@ -169,10 +170,16 @@ public class JUnitXMLReporter implements ITestListener, IConfigurationListener2 
         }
     }
 
-    protected static void closeStreams() {
-        Util.close(stdout.get());
+    protected static void closeStreams(String name) {
+        System.out.println("--- Closing and flushing streams for test: " + name);
+        PrintStream ps = stdout.get();
+        ps.flush();
+        Util.close(ps);
         stdout.set(null);
-        Util.close(stderr.get());
+
+        PrintStream es = stderr.get();
+        es.flush();
+        Util.close(es);
         stderr.set(null);
     }
 

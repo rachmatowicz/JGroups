@@ -1,18 +1,35 @@
 package org.jgroups.tests.byteman;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.jboss.byteman.contrib.bmunit.BMNGRunner;
 import org.jboss.byteman.contrib.bmunit.BMScript;
-import org.jgroups.*;
-import org.jgroups.protocols.*;
+import org.jgroups.Address;
+import org.jgroups.Event;
+import org.jgroups.Global;
+import org.jgroups.JChannel;
+import org.jgroups.Message;
+import org.jgroups.ReceiverAdapter;
+import org.jgroups.View;
+import org.jgroups.protocols.DISCARD;
+import org.jgroups.protocols.FD;
+import org.jgroups.protocols.FD_ALL;
+import org.jgroups.protocols.MERGE2;
+import org.jgroups.protocols.MERGE3;
+import org.jgroups.protocols.SEQUENCER;
+import org.jgroups.protocols.TP;
+import org.jgroups.protocols.VERIFY_SUSPECT;
 import org.jgroups.protocols.pbcast.GMS;
 import org.jgroups.stack.ProtocolStack;
 import org.jgroups.util.Util;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.*;
 
 
 /**
@@ -65,7 +82,8 @@ public class SequencerFailoverTest extends BMNGRunner {
      * same time doesn't lead to incorrect ordering (forward-queue messages need to be delivered before new msgs).
      * https://issues.jboss.org/browse/JGRP-1449
      */
-    @BMScript(dir="scripts/SequencerFailoverTest", value="testResendingVersusNewMessages")
+    // @BMScript(dir="scripts/SequencerFailoverTest", value="testResendingVersusNewMessages")
+    @BMScript(dir="SequencerFailoverTest", value="testResendingVersusNewMessages")
     public void testResendingVersusNewMessages() throws Exception {
         MyReceiver rb=new MyReceiver("B"), rc=new MyReceiver("C");
         b.setReceiver(rb); c.setReceiver(rc);

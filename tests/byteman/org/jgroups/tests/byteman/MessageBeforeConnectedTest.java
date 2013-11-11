@@ -1,5 +1,8 @@
 package org.jgroups.tests.byteman;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jboss.byteman.contrib.bmunit.BMNGRunner;
 import org.jboss.byteman.contrib.bmunit.BMScript;
 import org.jgroups.Global;
@@ -14,9 +17,6 @@ import org.jgroups.protocols.pbcast.NAKACK2;
 import org.jgroups.util.Util;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Tests the behavior of receiving a unicast message before being connected and sending a response which will
@@ -56,7 +56,8 @@ public class MessageBeforeConnectedTest extends BMNGRunner {
      * trigger an exception.
      * Issue: https://issues.jboss.org/browse/JGRP-1545
      */
-    @BMScript(dir="scripts/MessageBeforeConnectedTest", value="testSendingOfMsgsOnUnconnectedChannel")
+    // @BMScript(dir="scripts/MessageBeforeConnectedTest", value="testSendingOfMsgsOnUnconnectedChannel")
+    @BMScript(dir="MessageBeforeConnectedTest", value="testSendingOfMsgsOnUnconnectedChannel")
     public void testSendingOfMsgsOnUnconnectedChannel() throws Throwable {
         a=createChannel("A");
         a.setReceiver(new ReceiverAdapter() {

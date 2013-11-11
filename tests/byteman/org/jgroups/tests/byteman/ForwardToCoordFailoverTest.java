@@ -1,9 +1,18 @@
 package org.jgroups.tests.byteman;
 
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.jboss.byteman.contrib.bmunit.BMNGRunner;
 import org.jboss.byteman.contrib.bmunit.BMScript;
-import org.jgroups.*;
+import org.jgroups.Event;
+import org.jgroups.Global;
+import org.jgroups.JChannel;
+import org.jgroups.Message;
+import org.jgroups.ReceiverAdapter;
+import org.jgroups.View;
 import org.jgroups.protocols.FORWARD_TO_COORD;
 import org.jgroups.protocols.PING;
 import org.jgroups.protocols.SHARED_LOOPBACK;
@@ -14,10 +23,6 @@ import org.jgroups.util.Util;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 
 /**
@@ -54,7 +59,8 @@ public class ForwardToCoordFailoverTest extends BMNGRunner {
      * <p/>
      * https://issues.jboss.org/browse/JGRP-1517
      */
-    @BMScript(dir="scripts/ForwardToCoordFailoverTest", value="testSendingDuringViewChange")
+    // @BMScript(dir="scripts/ForwardToCoordFailoverTest", value="testSendingDuringViewChange")
+    @BMScript(dir="ForwardToCoordFailoverTest", value="testSendingDuringViewChange")
     public void testSendingDuringViewChange() throws Exception {
         MyReceiver rb=new MyReceiver("B");
         b.setReceiver(rb);
