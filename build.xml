@@ -31,6 +31,7 @@
     <property name="javadoc.dir" value="${dist.dir}/javadoc"/>
     <property name="conf.dir" value="${root.dir}/conf"/>
     <property name="testng.conf.dir" value="${root.dir}/conf/testng"/>
+    <property name="scripts.dir" value="${root.dir}/conf/scripts"/>
     <property name="bin.dir"          value="${root.dir}/bin"/>
     <property name="keystore.dir"     value="${root.dir}/keystore"/>
     <property name="javadoc.packages" value="org.jgroups.*"/>
@@ -62,6 +63,7 @@
     <!-- We need to include tools.jar for byteman to inject code into a running agent -->
     <path id="jg.classpath.byteman">
         <path refid="jg.classpath"/>
+        <pathelement location="${scripts.dir}"/>
         <pathelement location="${java.home}/../lib/tools.jar"/>
     </path>
 
@@ -401,7 +403,12 @@
                  testname.ext="byteman"
                  threadcount="1"
                  parallel="false"
-                 testng.xmlfile="byteman.xml"/>
+                 testng.xmlfile="byteman.xml">
+            <additional-args>
+                <jvmarg value="-Dorg.jboss.byteman.contrib.bmunit.agent.inhibit=true"/>
+                <jvmarg value="-javaagent:${lib.dir}/byteman.jar=listener:true"/>
+            </additional-args>
+        </runtest>
     </target>
 
     <target name="time-sensitive" depends="postcompile">
@@ -529,6 +536,7 @@
         <attribute name="initial.tcp.port" default="23000"/>
         <attribute name="tcp.recv.buf.size" default="200000"/>
         <attribute name="tcp.send.buf.size" default="64000"/>
+        <element name="additional-args" optional="yes"/>
         <sequential>
 
             <!-- use XSLT to add parallelism directives to the suite definition files -->
@@ -561,6 +569,7 @@
     		  	<jvmarg value="-Djava.net.preferIPv6Addresses=${java.net.preferIPv6Addresses}"/>
                 <jvmarg value="-Xms400M"/>
                 <jvmarg value="-Xmx800M"/>
+                <additional-args/>
             </testng>
         </sequential>
     </macrodef>
