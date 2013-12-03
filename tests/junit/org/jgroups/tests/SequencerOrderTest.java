@@ -3,6 +3,10 @@
 package org.jgroups.tests;
 
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.jgroups.Global;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
@@ -15,10 +19,6 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
 
 /**
  * Tests ordering with SEQUENCER: NUM_THREADS send messages concurrently over 3 channels, each thread sending NUM_MSGS
@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * receiver delivered all messages in the same order.
  * @author Bela Ban
  */
-@Test(groups=Global.STACK_INDEPENDENT,sequential=true)
+@Test(groups={Global.STACK_INDEPENDENT, "broken"},sequential=true)
 public class SequencerOrderTest {
     private JChannel    c1, c2, c3;
     private MyReceiver  r1, r2, r3;

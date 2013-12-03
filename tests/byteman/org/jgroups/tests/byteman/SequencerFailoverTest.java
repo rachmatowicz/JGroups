@@ -1,10 +1,29 @@
 package org.jgroups.tests.byteman;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.jboss.byteman.contrib.bmunit.BMNGRunner;
 import org.jboss.byteman.contrib.bmunit.BMScript;
-import org.jgroups.*;
-import org.jgroups.protocols.*;
+import org.jgroups.Address;
+import org.jgroups.Event;
+import org.jgroups.Global;
+import org.jgroups.JChannel;
+import org.jgroups.Message;
+import org.jgroups.ReceiverAdapter;
+import org.jgroups.View;
+import org.jgroups.protocols.DISCARD;
+import org.jgroups.protocols.FD;
+import org.jgroups.protocols.FD_ALL;
+import org.jgroups.protocols.MERGE2;
+import org.jgroups.protocols.MERGE3;
+import org.jgroups.protocols.SEQUENCER;
+import org.jgroups.protocols.TP;
+import org.jgroups.protocols.VERIFY_SUSPECT;
 import org.jgroups.protocols.pbcast.GMS;
 import org.jgroups.stack.ProtocolStack;
 import org.jgroups.util.Util;
@@ -12,15 +31,13 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.util.*;
-
 
 /**
  * Tests SEQUENCER with message sending while the coordinator crashes
  * (see individual tests for more detailed descriptions).
  * @author Bela Ban
  */
-@Test(groups=Global.BYTEMAN,sequential=true)
+@Test(groups={Global.BYTEMAN, "broken"},sequential=true)
 public class SequencerFailoverTest extends BMNGRunner {
     JChannel a, b, c; // A is the coordinator
     static final String GROUP="SequencerFailoverTest";

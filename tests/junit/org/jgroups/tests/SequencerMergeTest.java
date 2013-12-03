@@ -1,9 +1,25 @@
 package org.jgroups.tests;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.jboss.byteman.contrib.bmunit.BMNGRunner;
-import org.jgroups.*;
-import org.jgroups.protocols.*;
+import org.jgroups.Address;
+import org.jgroups.Event;
+import org.jgroups.Global;
+import org.jgroups.JChannel;
+import org.jgroups.Message;
+import org.jgroups.ReceiverAdapter;
+import org.jgroups.View;
+import org.jgroups.protocols.DISCARD;
+import org.jgroups.protocols.PING;
+import org.jgroups.protocols.SEQUENCER;
+import org.jgroups.protocols.UDP;
+import org.jgroups.protocols.UNICAST2;
 import org.jgroups.protocols.pbcast.GMS;
 import org.jgroups.protocols.pbcast.NAKACK;
 import org.jgroups.protocols.pbcast.NAKACK2;
@@ -16,15 +32,13 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.util.*;
-
 
 /**
  * Tests merging with SEQUENCER
  * @author Bela Ban
  * @since 3.1
  */
-@Test(groups=Global.STACK_INDEPENDENT,sequential=true)
+@Test(groups={Global.STACK_INDEPENDENT, "broken"},sequential=true)
 public class SequencerMergeTest extends BMNGRunner {
     JChannel a, b, c, d;
     static final String GROUP="SequencerMergeTest";
