@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 /**
  * @author Bela Ban
  */
-@Test(groups={Global.STACK_DEPENDENT,"broken"},sequential=false)
+@Test(groups=Global.STACK_DEPENDENT,sequential=false)
 public class PrioTest extends ChannelTestBase {
     protected JChannel c1, c2;
     protected PrioReceiver r1, r2;

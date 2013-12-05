@@ -1,16 +1,24 @@
 package org.jgroups.protocols;
 
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.MulticastSocket;
+import java.net.NetworkInterface;
+import java.net.NoRouteToHostException;
+import java.net.SocketAddress;
+import java.net.SocketException;
+import java.util.List;
+import java.util.Map;
+
 import org.jgroups.Global;
 import org.jgroups.PhysicalAddress;
 import org.jgroups.annotations.Property;
 import org.jgroups.stack.IpAddress;
 import org.jgroups.util.Util;
-
-import java.io.IOException;
-import java.net.*;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -388,6 +396,8 @@ public class UDP extends TP {
         }
 
         setBufferSizes();
+
+        System.out.println("\nSocket information:\n" + dumpSocketInfo());
         if(log.isDebugEnabled()) log.debug("socket information:\n" + dumpSocketInfo());
     }
 
