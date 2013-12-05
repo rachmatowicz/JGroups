@@ -240,6 +240,7 @@ public class Util {
                 View view=ch.getView();
                 if(view == null || view.size() != size) {
                     all_channels_have_correct_size=false;
+                    System.out.println("checkingChannelSize: size not correct for channel " + view == null ? "null" : view.toString());
                     break;
                 }
             }
