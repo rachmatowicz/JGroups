@@ -22,6 +22,9 @@ public class UnicastLoopbackTest extends ChannelTestBase {
     @BeforeMethod
     protected void setUp() throws Exception {
         channel=createChannel(true, 1);
+        // trace logging
+        TP tp = (TP) channel.getProtocolStack().findProtocol(TP.class);
+        if(tp != null) tp.setLevel("trace");
     }
 
     @AfterMethod
@@ -38,7 +41,7 @@ public class UnicastLoopbackTest extends ChannelTestBase {
      * @throws TimeoutException
      */
     public void testUnicastMsgsWithLoopback() throws Exception {
-    	final long TIMEOUT = 2 * 10000 ;
+    	final long TIMEOUT = 20 * 1000 ;
     	final int NUM=1000;
     	long num_msgs_sent_before = 0 ;
     	long num_msgs_sent_after = 0 ;
