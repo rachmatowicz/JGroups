@@ -1,7 +1,18 @@
 package org.jgroups.tests;
 
 
-import org.jgroups.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentMap;
+
+import org.jgroups.Address;
+import org.jgroups.Channel;
+import org.jgroups.Global;
+import org.jgroups.JChannel;
+import org.jgroups.Message;
+import org.jgroups.ReceiverAdapter;
 import org.jgroups.protocols.DUPL;
 import org.jgroups.protocols.UNICAST2;
 import org.jgroups.protocols.pbcast.NAKACK2;
@@ -12,12 +23,6 @@ import org.jgroups.util.Util;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * Tests whether UNICAST or NAKACK prevent delivery of duplicate messages. JGroups guarantees that a message is
@@ -270,11 +275,11 @@ public class DuplicateTest extends ChannelTestBase {
             return name;
         }
 
-        public Map<Address, Collection<Long>> getMsgs() {
+        public synchronized Map<Address, Collection<Long>> getMsgs() {
             return msgs;
         }
 
-        public void receive(Message msg) {
+        public synchronized void receive(Message msg) {
             Address addr=msg.getSrc();
             Long val=(Long)msg.getObject();
 
@@ -288,12 +293,12 @@ public class DuplicateTest extends ChannelTestBase {
             list.add(val);
         }
 
-        public void clear() {
+        public synchronized void clear() {
             msgs.clear();
         }
 
 
-        public String toString() {
+        public synchronized String toString() {
             StringBuilder sb=new StringBuilder();
             sb.append("receiver " + name).append(":\n");
             for(Map.Entry<Address,Collection<Long>> entry: msgs.entrySet()) {
