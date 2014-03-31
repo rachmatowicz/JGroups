@@ -1,18 +1,33 @@
 package org.jgroups.protocols;
 
-import org.jgroups.*;
+import java.io.InterruptedIOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import org.jgroups.Address;
+import org.jgroups.Event;
+import org.jgroups.Message;
+import org.jgroups.PhysicalAddress;
+import org.jgroups.View;
+import org.jgroups.ViewId;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
 import org.jgroups.protocols.pbcast.JoinRsp;
 import org.jgroups.stack.Protocol;
-import org.jgroups.util.*;
+import org.jgroups.util.Promise;
+import org.jgroups.util.TimeScheduler;
+import org.jgroups.util.Tuple;
 import org.jgroups.util.UUID;
-
-import java.io.InterruptedIOException;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import org.jgroups.util.Util;
 
 
 /**
@@ -633,6 +648,7 @@ public abstract class Discovery extends Protocol {
               : stagger_timeout * rank / view_size - (stagger_timeout / view_size);
             timer.schedule(new Runnable() {
                 public void run() {
+                    System.out.println("Discovery: " + local_addr + " sending (staggered) discovery response to " + sender);
                     if(log.isTraceEnabled())
                         log.trace(local_addr + ": received GET_MBRS_REQ from " + sender + ", sending staggered response " + rsp_hdr);
                     down_prot.down(new Event(Event.MSG, rsp_msg));
@@ -641,6 +657,7 @@ public abstract class Discovery extends Protocol {
             return;
         }
 
+        System.out.println("Discovery: " + local_addr + " sending discovery response to " + sender);
         if(log.isTraceEnabled())
             log.trace(local_addr + ": received GET_MBRS_REQ from " + sender + ", sending response " + rsp_hdr);
         down_prot.down(new Event(Event.MSG, rsp_msg));
