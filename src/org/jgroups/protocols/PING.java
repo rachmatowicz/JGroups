@@ -1,8 +1,9 @@
 package org.jgroups.protocols;
 
-import org.jgroups.PhysicalAddress;
-
 import java.util.Collection;
+
+import org.jgroups.Address;
+import org.jgroups.PhysicalAddress;
 
 
 /**
@@ -25,5 +26,11 @@ public class PING extends Discovery {
 
     public boolean sendDiscoveryRequestsInParallel() {
         return false; // there's just 1 multicast message; no need to send it on a separate thread
+    }
+
+    @Override
+    public void discoveryRequestReceived(Address sender, String logical_name, Collection<PhysicalAddress> physical_addrs) {
+        super.discoveryRequestReceived(sender, logical_name, physical_addrs);
+        System.out.println("PING: " + local_addr + " received discovery request from " + sender);
     }
 }

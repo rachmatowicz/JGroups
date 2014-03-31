@@ -128,6 +128,7 @@ public class TCPPING extends Discovery {
 
     public void discoveryRequestReceived(Address sender, String logical_name, Collection<PhysicalAddress> physical_addrs) {
         super.discoveryRequestReceived(sender, logical_name, physical_addrs);
+        System.out.println("TCPPING: " + local_addr + " received discovery request from " + sender);
         if(physical_addrs != null) {
             for(PhysicalAddress addr: physical_addrs) {
                 if(!initial_hosts.contains(addr))
