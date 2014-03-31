@@ -266,6 +266,8 @@ public abstract class Discovery extends Protocol {
             data=new PingData(local_addr, null, false, UUID.get(local_addr), physical_addrs);
         }
 
+        System.out.println("Discovery: sending discovery request: view_id = " + view_id + ", data = " + (data == null ? "null" : "non-null"));
+
         PingHeader hdr=new PingHeader(PingHeader.GET_MBRS_REQ, data, cluster_name);
         hdr.view_id=view_id;
 
@@ -291,12 +293,14 @@ public abstract class Discovery extends Protocol {
                     if(log.isTraceEnabled())
                         log.trace(local_addr + ": sending discovery request to " + msg.getDest());
                     if(!sendDiscoveryRequestsInParallel()) {
+                        System.out.println(local_addr + ": sending in-line discovery request to " + msg.getDest());
                         down_prot.down(new Event(Event.MSG, msg));
                     }
                     else {
                         timer.execute(new Runnable() {
                             public void run() {
                                 try {
+                                    System.out.println(local_addr + ": sending async discovery request to " + msg.getDest());
                                     down_prot.down(new Event(Event.MSG, msg));
                                 }
                                 catch(Exception ex){
@@ -385,6 +389,9 @@ public abstract class Discovery extends Protocol {
                 switch(hdr.type) {
 
                     case PingHeader.GET_MBRS_REQ:   // return Rsp(local_addr, coord)
+
+                        System.out.println("Discovery: " + local_addr + "processing GET_MBRS_REQ");
+
                         if(group_addr == null || hdr.cluster_name == null) {
                             if(log.isWarnEnabled())
                                 log.warn("group_addr (" + group_addr + ") or cluster_name of header (" + hdr.cluster_name
@@ -466,6 +473,9 @@ public abstract class Discovery extends Protocol {
                         return null;
 
                     case PingHeader.GET_MBRS_RSP:   // add response to vector and notify waiting thread
+
+                        System.out.println("Discovery: " + local_addr + "processing GET_MBRS_RSP");
+
                         // add physical address (if available) to transport's cache
                         if(data != null) {
                             Address response_sender=msg.getSrc();
