@@ -2,15 +2,22 @@
 package org.jgroups.protocols;
 
 
-import org.jgroups.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.jgroups.Address;
+import org.jgroups.Event;
+import org.jgroups.Global;
+import org.jgroups.PhysicalAddress;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
 import org.jgroups.conf.PropertyConverters;
 import org.jgroups.stack.IpAddress;
 import org.jgroups.util.BoundedList;
-
-import java.util.*;
 
 
 /**
@@ -101,7 +108,7 @@ public class TCPPING extends Discovery {
     }
 
     public boolean sendDiscoveryRequestsInParallel() {
-        return true;
+        return false;
     }
 
     public Object down(Event evt) {
