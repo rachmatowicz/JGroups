@@ -209,10 +209,12 @@ public abstract class Discovery extends Protocol {
      * @return
      */
     public List<PingData> findInitialMembers(Promise<JoinRsp> promise) {
+        System.out.println("Discovery: " + local_addr + " calling findInitialMbrs:");
         return findMembers(promise, num_initial_members, break_on_coord_rsp, null);
     }
 
     public List<PingData> findAllViews(Promise<JoinRsp> promise) {
+        System.out.println("Discovery: " + local_addr + " calling findAllViews:");
         int num_expected_mbrs=Math.max(max_found_members, Math.max(num_initial_members, view != null? view.size() : num_initial_members));
         max_found_members=Math.max(max_found_members, num_expected_mbrs);
         return findMembers(promise, num_expected_mbrs, false, getViewId());
