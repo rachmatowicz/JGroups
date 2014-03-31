@@ -701,10 +701,14 @@ public abstract class Discovery extends Protocol {
         }
 
         public void addResponse(PingData rsp, boolean overwrite) {
+
             if(rsp == null)
                 return;
             promise.getLock().lock();
             try {
+
+                System.out.println("Responses: adding response from " + rsp.getAddress());
+
                 if(overwrite)
                     ping_rsps.remove(rsp);
 
