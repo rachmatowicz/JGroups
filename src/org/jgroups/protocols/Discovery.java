@@ -390,8 +390,6 @@ public abstract class Discovery extends Protocol {
 
                     case PingHeader.GET_MBRS_REQ:   // return Rsp(local_addr, coord)
 
-                        System.out.println("Discovery: " + local_addr + "processing GET_MBRS_REQ");
-
                         if(group_addr == null || hdr.cluster_name == null) {
                             if(log.isWarnEnabled())
                                 log.warn("group_addr (" + group_addr + ") or cluster_name of header (" + hdr.cluster_name
@@ -425,6 +423,9 @@ public abstract class Discovery extends Protocol {
                                     response.addResponse(data, false);
                                 }
                             }
+                            System.out.println("Discovery: " + local_addr + " processing GET_MBRS_REQ from sender: " + msg.getSrc());
+                        } else {
+                            System.out.println("Discovery: " + local_addr + " processing GET_MBRS_REQ: data == null");
                         }
 
                         if(hdr.view_id != null) {
@@ -474,8 +475,6 @@ public abstract class Discovery extends Protocol {
 
                     case PingHeader.GET_MBRS_RSP:   // add response to vector and notify waiting thread
 
-                        System.out.println("Discovery: " + local_addr + "processing GET_MBRS_RSP");
-
                         // add physical address (if available) to transport's cache
                         if(data != null) {
                             Address response_sender=msg.getSrc();
@@ -489,6 +488,8 @@ public abstract class Discovery extends Protocol {
                             if(logical_addr != null && data.getLogicalName() != null)
                                 UUID.add(logical_addr, data.getLogicalName());
 
+                            System.out.println("Discovery: " + local_addr + " processing GET_MBRS_RSP from " + response_sender + ":" + data);
+
                             if(log.isTraceEnabled())
                                 log.trace(local_addr + ": received GET_MBRS_RSP from " + response_sender + ": " + data);
                             boolean overwrite=logical_addr != null && logical_addr.equals(response_sender);
@@ -497,7 +498,10 @@ public abstract class Discovery extends Protocol {
                                     response.addResponse(data, overwrite);
                                 }
                             }
+                        } else {
+                            System.out.println("Discovery: " + local_addr + " processing GET_MBRS_RSP: data == null");
                         }
+
                         return null;
 
                     default:
