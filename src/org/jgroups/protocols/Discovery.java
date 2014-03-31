@@ -220,6 +220,8 @@ public abstract class Discovery extends Protocol {
 
     protected List<PingData> findMembers(Promise<JoinRsp> promise, int num_expected_rsps,
                                          boolean break_on_coord, ViewId view_id) {
+
+        System.out.println("Discovery: " + local_addr + " calling findMembers: num_expected = " + num_expected_rsps + ", view_id = " + view_id);
         num_discovery_requests++;
 
         final Responses rsps=new Responses(num_expected_rsps, break_on_coord, promise);
@@ -248,6 +250,7 @@ public abstract class Discovery extends Protocol {
             return new LinkedList<PingData>();
         }
         finally {
+            System.out.println("Discovery: " + local_addr + " called findMembers");
             synchronized(ping_responses) {
                 ping_responses.remove(rsps);
             }
