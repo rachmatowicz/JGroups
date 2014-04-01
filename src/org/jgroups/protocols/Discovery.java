@@ -698,6 +698,7 @@ public abstract class Discovery extends Protocol {
             this.num_expected_rsps=num_expected_rsps;
             this.break_on_coord_rsp=break_on_coord_rsp;
             this.promise=promise != null? promise : new Promise<JoinRsp>();
+            System.out.println("Responses (init): ping_rsps size = " + ping_rsps.size());
         }
 
         public void addResponse(PingData rsp) {
@@ -710,7 +711,6 @@ public abstract class Discovery extends Protocol {
                 return;
             promise.getLock().lock();
             try {
-
                 System.out.println("Responses: adding response from " + rsp.getAddress());
 
                 if(overwrite)
@@ -743,15 +743,21 @@ public abstract class Discovery extends Protocol {
             promise.getLock().lock();
             try {
                 while(time_to_wait > 0 && !promise.hasResult()) {
-                    if(ping_rsps.size() >= num_expected_rsps && (break_on_coord_rsp && containsCoordinatorResponse(ping_rsps)))
+                    // this is incorrect
+                    if(ping_rsps.size() >= num_expected_rsps && (break_on_coord_rsp && containsCoordinatorResponse(ping_rsps))) {
+                        System.out.println("Responses: returning from A (num expected responses): rsps size = " + ping_rsps.size());
                         return new LinkedList<PingData>(ping_rsps);
+                    }
 
-                    if(break_on_coord_rsp &&  containsCoordinatorResponse(ping_rsps))
+                    if(break_on_coord_rsp &&  containsCoordinatorResponse(ping_rsps)) {
+                        System.out.println("Responses: returning from B (coordinator response)): rsps size = " + ping_rsps.size());
                         return new LinkedList<PingData>(ping_rsps);
+                    }
 
                     promise.getCond().await(time_to_wait, TimeUnit.MILLISECONDS);
                     time_to_wait=timeout - (System.currentTimeMillis() - start_time);
                 }
+                System.out.println("Responses: returning from C (timeout): rsps size = " + ping_rsps.size());
                 return new LinkedList<PingData>(ping_rsps);
             }
             finally {
