@@ -436,8 +436,10 @@ public abstract class Discovery extends Protocol {
                             // If the discovery request is merge-triggered, and the ViewId shipped with it
                             // is the same as ours, we don't respond (JGRP-1315).
                             ViewId my_view_id=view != null? view.getViewId() : null;
-                            if(my_view_id != null && my_view_id.equals(hdr.view_id))
+                            if(my_view_id != null && my_view_id.equals(hdr.view_id)) {
+                                System.out.println("Discovery: " + local_addr + " not processing GET_MBRS_REQ - merge triggered and same view id ");
                                 return null;
+                            }
 
                             boolean send_discovery_rsp=force_sending_discovery_rsps || is_coord
                               || current_coord == null || current_coord.equals(msg.getSrc());
