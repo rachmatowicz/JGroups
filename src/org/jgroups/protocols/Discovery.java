@@ -392,6 +392,8 @@ public abstract class Discovery extends Protocol {
 
                     case PingHeader.GET_MBRS_REQ:   // return Rsp(local_addr, coord)
 
+                        System.out.println("Discovery: entering GET_MBRS_REQ");
+
                         if(group_addr == null || hdr.cluster_name == null) {
                             if(log.isWarnEnabled())
                                 log.warn("group_addr (" + group_addr + ") or cluster_name of header (" + hdr.cluster_name
