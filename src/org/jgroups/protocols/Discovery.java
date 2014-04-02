@@ -1,18 +1,33 @@
 package org.jgroups.protocols;
 
-import org.jgroups.*;
+import java.io.InterruptedIOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import org.jgroups.Address;
+import org.jgroups.Event;
+import org.jgroups.Message;
+import org.jgroups.PhysicalAddress;
+import org.jgroups.View;
+import org.jgroups.ViewId;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
 import org.jgroups.protocols.pbcast.JoinRsp;
 import org.jgroups.stack.Protocol;
-import org.jgroups.util.*;
+import org.jgroups.util.Promise;
+import org.jgroups.util.TimeScheduler;
+import org.jgroups.util.Tuple;
 import org.jgroups.util.UUID;
-
-import java.io.InterruptedIOException;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import org.jgroups.util.Util;
 
 
 /**
@@ -367,6 +382,9 @@ public abstract class Discovery extends Protocol {
                 switch(hdr.type) {
 
                     case PingHeader.GET_MBRS_REQ:   // return Rsp(local_addr, coord)
+
+                        System.out.println("Discovery:" + local_addr + " received GET_MBRS_REQ");
+
                         if(group_addr == null || hdr.cluster_name == null) {
                             if(log.isWarnEnabled())
                                 log.warn("group_addr (" + group_addr + ") or cluster_name of header (" + hdr.cluster_name
@@ -448,6 +466,9 @@ public abstract class Discovery extends Protocol {
                         return null;
 
                     case PingHeader.GET_MBRS_RSP:   // add response to vector and notify waiting thread
+
+                        System.out.println("Discovery:" + local_addr + " received GET_MBRS_RSP");
+
                         // add physical address (if available) to transport's cache
                         if(data != null) {
                             Address response_sender=msg.getSrc();
@@ -640,6 +661,8 @@ public abstract class Discovery extends Protocol {
             }, sleep_time, TimeUnit.MILLISECONDS);
             return;
         }
+
+        System.out.println("Discovery: " + local_addr + ": received GET_MBRS_REQ from " + sender + ", sending response " + rsp_hdr);
 
         if(log.isTraceEnabled())
             log.trace(local_addr + ": received GET_MBRS_REQ from " + sender + ", sending response " + rsp_hdr);
