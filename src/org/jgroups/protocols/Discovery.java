@@ -269,7 +269,7 @@ public abstract class Discovery extends Protocol {
         Collection<PhysicalAddress> cluster_members=fetchClusterMembers(cluster_name);
         if(cluster_members == null) {
             Message msg=new Message(null);  // multicast msg
-            msg.setFlag(Message.OOB);
+            //msg.setFlag(Message.OOB);
             msg.putHeader(getId(), hdr);
             sendMcastDiscoveryRequest(msg);
         }
@@ -283,7 +283,7 @@ public abstract class Discovery extends Protocol {
                     if(addr.equals(physical_addr)) // no need to send the request to myself
                         continue;
                     final Message msg=new Message(addr, null, null);
-                    msg.setFlag(Message.OOB);
+                    //msg.setFlag(Message.OOB);
                     msg.putHeader(this.id, hdr);
                     if(log.isTraceEnabled())
                         log.trace(local_addr + ": sending discovery request to " + msg.getDest());
@@ -643,7 +643,7 @@ public abstract class Discovery extends Protocol {
         }
 
         final Message rsp_msg=new Message(sender, null, null);
-        rsp_msg.setFlag(Message.OOB);
+        // rsp_msg.setFlag(Message.OOB);
         final PingHeader rsp_hdr=new PingHeader(PingHeader.GET_MBRS_RSP, data);
         rsp_msg.putHeader(this.id, rsp_hdr);
 
