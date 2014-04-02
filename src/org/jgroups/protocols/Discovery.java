@@ -487,6 +487,7 @@ public abstract class Discovery extends Protocol {
                             boolean overwrite=logical_addr != null && logical_addr.equals(response_sender);
                             synchronized(ping_responses) {
                                 for(Responses response: ping_responses) {
+                                    System.out.println("Discovery: " + local_addr + " adding ping rsp (to responses) from " + data.getAddress());
                                     response.addResponse(data, overwrite);
                                 }
                             }
