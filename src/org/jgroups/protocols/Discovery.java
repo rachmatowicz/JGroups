@@ -690,6 +690,7 @@ public abstract class Discovery extends Protocol {
         public void addResponse(PingData rsp, boolean overwrite) {
             if(rsp == null)
                 return;
+            System.out.println("Responses: calling add response: address = " + rsp.getAddress());
             promise.getLock().lock();
             try {
                 if(overwrite)
