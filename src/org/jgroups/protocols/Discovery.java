@@ -673,25 +673,26 @@ public abstract class Discovery extends Protocol {
 
 
     protected static class Responses {
-        final Promise<JoinRsp>  promise;
-        final List<PingData>    ping_rsps=new ArrayList<PingData>();
-        final int               num_expected_rsps;
-        final boolean           break_on_coord_rsp;
+        static Promise<JoinRsp>  promise = null;
+        //final List<PingData>    ping_rsps=new ArrayList<PingData>();
+        static List<PingData>    ping_rsps = null;
+        static int               num_expected_rsps = 0;
+        static boolean           break_on_coord_rsp = false;
 
         protected Responses(int num_expected_rsps, boolean break_on_coord_rsp, Promise<JoinRsp> promise) {
             this.num_expected_rsps=num_expected_rsps;
             this.break_on_coord_rsp=break_on_coord_rsp;
             this.promise=promise != null? promise : new Promise<JoinRsp>();
+            this.ping_rsps = new ArrayList<PingData>();
         }
 
-        public void addResponse(PingData rsp) {
+        public static void addResponse(PingData rsp) {
             addResponse(rsp, false);
         }
 
-        public void addResponse(PingData rsp, boolean overwrite) {
+        public static void addResponse(PingData rsp, boolean overwrite) {
             if(rsp == null)
                 return;
-            System.out.println("Responses: calling add response: address = " + rsp.getAddress());
             promise.getLock().lock();
             try {
                 if(overwrite)
@@ -700,6 +701,7 @@ public abstract class Discovery extends Protocol {
                 // https://jira.jboss.org/jira/browse/JGRP-1179
                 int index=ping_rsps.indexOf(rsp);
                 if(index == -1) {
+                    System.out.println("Responses: calling add response (not present): address = " + rsp.getAddress());
                     ping_rsps.add(rsp);
                     promise.getCond().signalAll();
                 }
@@ -708,6 +710,7 @@ public abstract class Discovery extends Protocol {
 
                     // Check if the already existing element is not server
                     if(!pr.isCoord()) {
+                        System.out.println("Responses: calling add response (present): address = " + rsp.getAddress());
                         ping_rsps.set(index, rsp);
                         promise.getCond().signalAll();
                     }
@@ -718,12 +721,14 @@ public abstract class Discovery extends Protocol {
             }
         }
 
-        public List<PingData> get(long timeout) throws InterruptedException{
+        public static List<PingData> get(long timeout) throws InterruptedException{
             long start_time=System.currentTimeMillis(), time_to_wait=timeout;
 
             promise.getLock().lock();
             try {
                 while(time_to_wait > 0 && !promise.hasResult()) {
+                    System.out.println("ping_rsps: size = " + ping_rsps.size() + ", id = " + ping_rsps.toString());
+
                     if(ping_rsps.size() >= num_expected_rsps && (break_on_coord_rsp && containsCoordinatorResponse(ping_rsps)))
                         return new LinkedList<PingData>(ping_rsps);
 
